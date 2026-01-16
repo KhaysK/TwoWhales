@@ -1,9 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     const contractSelect = document.getElementById('contract');
+    const propertySelect = document.getElementById('property_type');
     const initialPaymentInput = document.getElementById('initial_payment');
     const installmentPeriodInput = document.getElementById('installment_period');
     const birthdateInput = document.getElementById('birthdate');
     const passportIssueDate = document.getElementById('passport_issue_date');
+
+    const apartmentData = document.getElementById('apartment_data');
+    const parkingData = document.getElementById('parking_data');
+    const totalArea = document.getElementById('total_area');
 
     function setDateLimits() {
         const today = new Date();
@@ -18,34 +23,52 @@ document.addEventListener('DOMContentLoaded', function() {
         passportIssueDate.max = formatDate(maxDate);
         passportIssueDate.min = formatDate(minDate);
     }
-    
-    setDateLimits();
 
     function updatePaymentFields() {
-        if (contractSelect.value === 'cash') {
-            // Для "налички" - дизейблим и очищаем поля
+        if (contractSelect.value === 'installment') {
+            // Для "рассрочки" - включаем поля
+            initialPaymentInput.disabled = false;
+            installmentPeriodInput.disabled = false;
+        }else {
+            // Для "налички" и другого - дизейблим и очищаем поля
             initialPaymentInput.disabled = true;
             installmentPeriodInput.disabled = true;
             initialPaymentInput.value = '';
             installmentPeriodInput.value = '';
-        } else if (contractSelect.value === 'installment') {
-            // Для "рассрочки" - включаем поля
-            initialPaymentInput.disabled = false;
-            installmentPeriodInput.disabled = false;
         }
     }
 
+    function updatePropertyFields() {
+        if (propertySelect.value === 'parking') {
+            // Для "парковки" - включаем поля парковки
+            apartmentData.style.display = 'none';
+            parkingData.style.display = 'block'; 
+            totalArea.value = 25;
+            totalArea.disabled = true;
+        }else {
+            // Для "квартиры" и другого - включаем поля квартиры
+            apartmentData.style.display = 'block'; 
+            parkingData.style.display = 'none';
+            totalArea.value = null;
+            totalArea.disabled = false;
+        }
+    }
+
+    setDateLimits();
+    updatePropertyFields();
     updatePaymentFields();
 
     contractSelect.addEventListener('change', updatePaymentFields);
+    propertySelect.addEventListener('change', updatePropertyFields);
 
     const submitBtn = document.getElementById('submit');
     const graphBtn = document.getElementById('graph');
 
     submitBtn.addEventListener('click', function(event) {
         event.preventDefault(); 
+        console.log('0');
         const form = document.querySelector('form');
-    
+        console.log('00');
         if (form.checkValidity()) {
             generateContract();
         } else {
@@ -69,16 +92,21 @@ document.addEventListener('DOMContentLoaded', function() {
 async function generateContract() {
     try {
         // 1. Собираем данные из формы
+        console.log('1');
         const formData = collectFormData();
-        console.log(formData);
+        console.log('2');
+
         // 2. Загружаем и заполняем DOCX шаблон
         const docxBuffer = await fillDocxTemplate(formData);
+        console.log('3');
 
         // 3. Конвертируем DOCX в PDF
         const pdfBlob = await convertDocxToPdf(docxBuffer);
+        console.log('4');
 
         // 4. Скачиваем PDF
         downloadFile(pdfBlob, 'договор.docx');
+                console.log('5');
 
     } catch (error) {
         console.error('Ошибка:', error);
@@ -93,9 +121,41 @@ function collectFormData() {
     const initial_payment = Number(document.getElementById('initial_payment').value);
     const totalPrice = pricePerSquare * total_area;
     const initialPaymentPercent = calculateInitialPaymentPercent(totalPrice, initial_payment);
+    const isApartmentType = document.getElementById('property_type').value === "apartment";
+
+    if(isApartmentType){
+        console.log('test')
+        return {
+            isCashContract: document.getElementById('contract').value === "cash",
+            isApartmentType: isApartmentType,
+            fullname: document.getElementById('fullname').value,
+            shortname: getShortName(document.getElementById('fullname').value),
+            birthdate: formatDate(document.getElementById('birthdate').value),
+            phone_number: document.getElementById('phone_number').value,
+            passport: document.getElementById('passport').value,
+            passport_issue_date: formatDate(document.getElementById('passport_issue_date').value),
+            passport_issued_by: document.getElementById('passport_issued_by').value,
+            passport_division_code: document.getElementById('passport_division_code').value,
+            registration_address: document.getElementById('registration_address').value,
+            living_address: document.getElementById('living_address').value,
+            building: document.getElementById('building').value,
+            construction_number: document.getElementById('construction_number').value,
+            floor: document.getElementById('floor').value,
+            rooms: document.getElementById('rooms').value,
+            installment_period: document.getElementById('installment_period').value,
+            price_per_square: formatNumberWithSpaces(pricePerSquare),
+            area: document.getElementById('area').value,
+            initial_payment: formatNumberWithSpaces(initial_payment),
+            initial_payment_percent: initialPaymentPercent,
+            price: formatNumberWithSpaces(totalPrice),
+            
+            current_date: formatDate(document.getElementById('current_date').value, true),
+        };
+    }
     
     return {
         isCashContract: document.getElementById('contract').value === "cash",
+        isApartmentType: isApartmentType,
         fullname: document.getElementById('fullname').value,
         shortname: getShortName(document.getElementById('fullname').value),
         birthdate: formatDate(document.getElementById('birthdate').value),
@@ -105,13 +165,10 @@ function collectFormData() {
         passport_issued_by: document.getElementById('passport_issued_by').value,
         passport_division_code: document.getElementById('passport_division_code').value,
         registration_address: document.getElementById('registration_address').value,
-        building: document.getElementById('building').value,
-        construction_number: document.getElementById('construction_number').value,
-        floor: document.getElementById('floor').value,
-        rooms: document.getElementById('rooms').value,
+        living_address: document.getElementById('living_address').value,
+        parking_num: document.getElementById('parking_num').value,
         installment_period: document.getElementById('installment_period').value,
         price_per_square: formatNumberWithSpaces(pricePerSquare),
-        area: document.getElementById('area').value,
         initial_payment: formatNumberWithSpaces(initial_payment),
         initial_payment_percent: initialPaymentPercent,
         price: formatNumberWithSpaces(totalPrice),
@@ -123,14 +180,21 @@ function collectFormData() {
 // Заполнение DOCX шаблона
 async function fillDocxTemplate(data) {
     const paymentData = data.isCashContract ? {} : getPaymentDataForWord();
+    let templateName = 'template.docx';
+    
+    if(data.isApartmentType) {
+        templateName = data.isCashContract ? 'template.docx' : 'template-installment.docx'
+    } else {
+        templateName = data.isCashContract ? 'template-parking.docx' : 'template-parking-installment.docx'
+    }
 
-    const response = await fetch(data.isCashContract ? 'template.docx' : 'template-installment.docx');
+    const response = await fetch(templateName);
     const templateBuffer = await response.arrayBuffer();
     
     const zip = new PizZip(templateBuffer);
 
     const doc = new docxtemplater(zip, {paragraphLoop: true, linebreaks: true});
-    console.log('paymentData', paymentData)
+
     // Заполняем шаблон данными
     const documentData = {
         ...data,

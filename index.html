@@ -31,16 +31,34 @@
 
                 <div class="formbold-input-flex">
                     <div>
+                        <label for="property_type" class="formbold-form-label">
+                            Тип Недвижимости
+                        </label>
+                        <select
+                            name="property_type"
+                            id="property_type"
+                            class="form-select"
+                        >
+                            <option value="" disabled selected>— Выберите —</option>
+                            <option value="apartment">Квартира</option>
+                            <option value="parking">Парковочное место</option>
+                        </select>
+                    </div>
+                    <div>
                         <label for="contract" class="formbold-form-label"> Тип Договора </label>
                         <select
                             name="contract"
                             id="contract"
                             class="form-select"
                         >
+                            <option value="" disabled selected>— Выберите —</option>
                             <option value="cash">Договор за наличку</option>
                             <option value="installment">Договор рассрочка</option>
                         </select>
                     </div>
+                </div>
+
+                <div class="formbold-input-flex">
                     <div>
                         <label for="current_date" class="formbold-form-label"> Дата Заключения Договора </label>
                         <input
@@ -150,66 +168,86 @@
                     />
                 </div>
 
+                <div class="formbold-mb-3">
+                    <label for="living_address" class="formbold-form-label"> Адрес проживания </label>
+                    <input
+                        type="text"
+                        name="living_address"
+                        id="living_address"
+                        class="formbold-form-input"
+                        required
+                    />
+                </div>
+
                 <div class="form-section-divider">
                     <span class="form-section-title">Объект приобретения</span>
                 </div>
 
-                <div class="formbold-input-flex">
+                <div class="formbold-input-flex" id="parking_data">
                     <div>
-                        <label for="building" class="formbold-form-label"> Корпус </label>
+                        <label for="parking_num" class="formbold-form-label"> Номер Парковочного Места </label>
                         <input
                             type="text"
-                            name="building"
-                            id="building"
+                            name="parking_num"
+                            id="parking_num"
                             class="formbold-form-input"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label for="construction_number" class="formbold-form-label"> Строительный номер </label>
-                        <input
-                            type="text"
-                            name="construction_number"
-                            id="construction_number"
-                            class="formbold-form-input"
-                            required
                         />
                     </div>
                 </div>
 
-                <div class="formbold-input-flex">
-                    <div>
-                        <label for="floor" class="formbold-form-label"> Этаж </label>
-                        <input
-                            type="number"
-                            name="floor"
-                            id="floor"
-                            class="formbold-form-input"
-                            required
-                        />
+                <div id="apartment_data">
+                    <div class="formbold-input-flex">
+                        <div>
+                            <label for="building" class="formbold-form-label"> Корпус </label>
+                            <input
+                                type="text"
+                                name="building"
+                                id="building"
+                                class="formbold-form-input"
+                            />
+                        </div>
+                        <div>
+                            <label for="construction_number" class="formbold-form-label"> Строительный номер </label>
+                            <input
+                                type="text"
+                                name="construction_number"
+                                id="construction_number"
+                                class="formbold-form-input"
+                            />
+                        </div>
                     </div>
-                    <div>
-                        <label for="rooms" class="formbold-form-label"> Количество комнат </label>
-                        <input
-                            type="text"
-                            name="rooms"
-                            id="rooms"
-                            class="formbold-form-input"
-                            required
-                        />
-                    </div>
-                </div>
 
-                <div class="formbold-input-flex">
-                    <div>
-                        <label for="area" class="formbold-form-label"> Общая проектная площадь (м²) </label>
-                        <input
-                            type="text"
-                            name="area"
-                            id="area"
-                            class="formbold-form-input"
-                            required
-                        />
+                    <div class="formbold-input-flex">
+                        <div>
+                            <label for="floor" class="formbold-form-label"> Этаж </label>
+                            <input
+                                type="number"
+                                name="floor"
+                                id="floor"
+                                class="formbold-form-input"
+                            />
+                        </div>
+                        <div>
+                            <label for="rooms" class="formbold-form-label"> Количество комнат </label>
+                            <input
+                                type="text"
+                                name="rooms"
+                                id="rooms"
+                                class="formbold-form-input"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="formbold-input-flex">
+                        <div>
+                            <label for="area" class="formbold-form-label"> Общая проектная площадь (м²) </label>
+                            <input
+                                type="text"
+                                name="area"
+                                id="area"
+                                class="formbold-form-input"
+                            />
+                        </div>
                     </div>
                 </div>
 
